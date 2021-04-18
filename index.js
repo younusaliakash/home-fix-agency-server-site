@@ -7,7 +7,7 @@ const MongoClient = require("mongodb").MongoClient;
 require("dotenv").config();
 
 const app = express();
-const port = 5000;
+const port = 5000 || process.env.PORT;
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -43,7 +43,7 @@ client.connect((err) => {
       });
   });
 
-  app.use('/reviews' , (req, res) => {
+  app.get('/reviews' , (req, res) => {
       reviewCollection.find()
       .toArray((error , data) => {
           res.send(data)
@@ -110,6 +110,15 @@ client.connect((err) => {
     adminCollection.insertOne(adminEmail).then((addAdminResult) => {
       res.send(addAdminResult.insertedCount > 0);
     });
+  });
+
+  app.post("/isAdmin", (req, res) => {
+    const adminEmail = req.body.email;
+    console.log(adminEmail)
+    adminCollection.find({email : adminEmail})
+    .toArray((error, isAdminResult) => {
+        res.send(isAdminResult.length > 0)
+    })
   });
 
   app.post("/addReview", (req, res) => {
